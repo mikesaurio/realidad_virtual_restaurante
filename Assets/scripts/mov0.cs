@@ -3,8 +3,11 @@ using UnityEngine;
 public class mov0 : MonoBehaviour
 {
     private Rigidbody rb;
+    private Vector3 startPosition;
+    private Quaternion startRotation;
     public float speed = 5f;
     public float jumpForce = 5f;
+    public float fallLimit = -10f;
     public float rotationSpeed = 30f;
     public float cameraRotationSpeed = 60f;
     public Transform cameraTransform;
@@ -14,6 +17,8 @@ public class mov0 : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        startPosition = transform.position;
+        startRotation = transform.rotation;
         y = transform.eulerAngles.y;
 
         // Si no se asignó en el Inspector, busca la cámara principal
@@ -23,6 +28,12 @@ public class mov0 : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (rb.position.y < fallLimit)
+        {
+            ResetPlayerPosition();
+            return;
+        }
+
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
@@ -42,6 +53,15 @@ public class mov0 : MonoBehaviour
 
         Vector3 movement = (forward * z + right * x) * speed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + movement);
+    }
+
+    private void ResetPlayerPosition()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.position = startPosition;
+        rb.rotation = startRotation;
+        y = startRotation.eulerAngles.y;
     }
 
     void Update()
