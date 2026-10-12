@@ -13,6 +13,9 @@ public class mov0 : MonoBehaviour
     public Transform cameraTransform;
     private float y;
     public Joystick joystick_mov;
+    public Joystick joystick_cam;
+    public RestaurantUI restaurantUI;
+    
 
     void Start()
     {
@@ -26,6 +29,7 @@ public class mov0 : MonoBehaviour
             cameraTransform = Camera.main.transform;
     }
 
+    
     void FixedUpdate()
     {
         if (rb.position.y < fallLimit)
@@ -43,6 +47,20 @@ public class mov0 : MonoBehaviour
             z = joystick_mov.Vertical;
         }
 
+        bool moviendo =
+            Mathf.Abs(x) > 0.1f ||
+            Mathf.Abs(z) > 0.1f;
+
+        bool moviendoCamara =
+            joystick_cam != null &&
+            (Mathf.Abs(joystick_cam.Horizontal) > 0.1f ||
+            Mathf.Abs(joystick_cam.Vertical) > 0.1f);
+
+        if (restaurantUI != null && (moviendo || moviendoCamara))
+        {
+            restaurantUI.OcultarInstrucciones();
+        }
+
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
 
@@ -51,9 +69,12 @@ public class mov0 : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        Vector3 movement = (forward * z + right * x) * speed * Time.fixedDeltaTime;
+        Vector3 movement =
+            (forward * z + right * x) * speed * Time.fixedDeltaTime;
+
         rb.MovePosition(rb.position + movement);
     }
+
 
     private void ResetPlayerPosition()
     {
@@ -62,13 +83,17 @@ public class mov0 : MonoBehaviour
         rb.position = startPosition;
         rb.rotation = startRotation;
         y = startRotation.eulerAngles.y;
+        if (restaurantUI != null)
+        {
+            restaurantUI.MostrarInstrucciones();
+        }
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+             Saltar();
         }
 
          if(Input.GetKey(KeyCode.K)){
@@ -87,5 +112,10 @@ public class mov0 : MonoBehaviour
         if(Input.GetKey(KeyCode.N)){
             cameraTransform.Rotate(2.0f, 0, 0);
         }
+    }
+
+    public void Saltar()
+    {
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 }
