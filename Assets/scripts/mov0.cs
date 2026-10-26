@@ -15,6 +15,7 @@ public class mov0 : MonoBehaviour
     public Joystick joystick_mov;
     public Joystick joystick_cam;
     public RestaurantUI restaurantUI;
+    [SerializeField] private Animator puertaAnimator;
     
 
     void Start()
@@ -86,6 +87,11 @@ public class mov0 : MonoBehaviour
         if (restaurantUI != null)
         {
             restaurantUI.MostrarInstrucciones();
+        }
+        if (puertaAnimator != null)
+        {
+            puertaAnimator.Rebind();
+            puertaAnimator.Update(0f);
         }
     }
 
